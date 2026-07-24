@@ -33,7 +33,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-     @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(name = "password_hash", nullable = false)
@@ -55,6 +55,9 @@ public class User {
 
     @Column(name = "instagram_url")
     private String instagramUrl;
+
+    @Column(nullable = true)
+    private String avatarUrl;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
