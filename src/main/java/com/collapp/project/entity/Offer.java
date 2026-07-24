@@ -46,8 +46,11 @@ public class Offer {
     @Column(nullable = false)
     private String location;
 
-    @Column(name = "event_date", nullable = false)
-    private LocalDate eventDate;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "compensation_type", nullable = false)
