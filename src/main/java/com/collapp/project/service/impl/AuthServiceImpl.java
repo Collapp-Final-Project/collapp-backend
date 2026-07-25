@@ -6,6 +6,7 @@ import com.collapp.project.dto.auth.RegisterRequest;
 import com.collapp.project.entity.User;
 import com.collapp.project.entity.enums.SystemRole;
 import com.collapp.project.repository.UserRepository;
+import com.collapp.project.security.CustomUserDetails;
 import com.collapp.project.security.JwtService;
 import com.collapp.project.service.AuthService;
 import jakarta.persistence.EntityExistsException;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .specialty(request.specialty())
-                .systemRole(SystemRole.ROLE_CREATIVE) // todo registro público crea un usuario creativo, nunca admin
+                .systemRole(SystemRole.ROLE_CREATIVE)
                 .avatarUrl(request.avatarUrl())
                 .portfolioUrl(request.portfolioUrl())
                 .instagramUrl(request.instagramUrl())
@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(buildUserDetails(user));
+        String token = jwtService.generateToken(new CustomUserDetails(user));
 
         return new AuthResponse(
                 token,
@@ -64,30 +64,20 @@ public class AuthServiceImpl implements AuthService {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.username(),
+                        request.email(),
                         request.password()
                 )
         );
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtService.generateToken(userDetails);
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
 
-        User user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado tras autenticación"));
+        String token = jwtService.generateToken(userDetails);
 
         return new AuthResponse(
                 token,
-                userDetails.getUsername(),
+                user.getUsername(),
                 user.getSystemRole().name()
         );
-    }
-
-    // Helper para generar el token justo tras el registro, sin pasar por AuthenticationManager
-    private UserDetails buildUserDetails(User user) {
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPasswordHash())
-                .authorities(user.getSystemRole().name())
-                .build();
     }
 }
