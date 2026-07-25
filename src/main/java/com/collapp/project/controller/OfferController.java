@@ -2,6 +2,7 @@ package com.collapp.project.controller;
 
 import com.collapp.project.dto.offer.OfferRequest;
 import com.collapp.project.dto.offer.OfferResponse;
+import com.collapp.project.dto.offer.OfferStatusRequest;
 import com.collapp.project.entity.enums.Specialty;
 import com.collapp.project.security.CustomUserDetails;
 import com.collapp.project.service.OfferService;
@@ -24,8 +25,7 @@ public class OfferController {
     @GetMapping
     public ResponseEntity<Page<OfferResponse>> list(
             @RequestParam(required = false) Specialty category,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         return ResponseEntity.ok(offerService.list(category, pageable));
     }
 
@@ -37,8 +37,7 @@ public class OfferController {
     @PostMapping
     public ResponseEntity<OfferResponse> create(
             @Valid @RequestBody OfferRequest request,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
         OfferResponse response = offerService.create(request, extractEmail(authentication));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -47,8 +46,7 @@ public class OfferController {
     public ResponseEntity<OfferResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody OfferRequest request,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
         return ResponseEntity.ok(offerService.update(id, request, extractEmail(authentication)));
     }
 
@@ -56,6 +54,14 @@ public class OfferController {
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
         offerService.delete(id, extractEmail(authentication));
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OfferResponse> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody OfferStatusRequest request,
+            Authentication authentication) {
+        return ResponseEntity.ok(offerService.updateStatus(id, request.status(), extractEmail(authentication)));
     }
 
     // Extrae el email del usuario autenticado

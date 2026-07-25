@@ -59,6 +59,14 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    public OfferResponse updateStatus(Long offerId, OfferStatus status, String requesterEmail) {
+        Offer offer = findOfferById(offerId);
+        assertIsOwner(offer, requesterEmail);
+        offer.setStatus(status);
+        return OfferResponse.fromEntity(offerRepository.save(offer));
+    }
+
+    @Override
     public void delete(Long offerId, String requesterEmail) {
         Offer offer = findOfferById(offerId);
         assertIsOwner(offer, requesterEmail);
@@ -79,7 +87,7 @@ public class OfferServiceImpl implements OfferService {
         return offers.map(OfferResponse::fromEntity);
     }
 
-    // --- Helpers  ---
+    // --- Helpers ---
 
     private Offer findOfferById(Long id) {
         return offerRepository.findById(id)
