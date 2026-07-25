@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -24,10 +23,10 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    // Generar un token de un UserDetails (username + rol)
-    public String generateToken(UserDetails userDetails) {
+    // El subject del token es el EMAIL — fuente de verdad única para identificar al usuario
+    public String generateToken(CustomUserDetails userDetails) {
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(userDetails.getUser().getEmail())
                 .claim("role", userDetails.getAuthorities().iterator().next().getAuthority())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
@@ -35,15 +34,13 @@ public class JwtService {
                 .compact();
     }
 
-    // Extraer el username del token
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Comprobar que el token pertenece a este usuario y no ha expirado
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    public boolean isTokenValid(String token, CustomUserDetails userDetails) {
+        final String email = extractEmail(token);
+        return email.equals(userDetails.getUser().getEmail()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

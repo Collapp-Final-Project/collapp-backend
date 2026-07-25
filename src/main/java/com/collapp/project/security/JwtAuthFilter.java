@@ -32,21 +32,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String jwt = authHeader.substring(7); // quita el prefijo "Bearer "
-        final String username = jwtService.extractUsername(jwt);
+        final String jwt = authHeader.substring(7);
+        final String email = jwtService.extractEmail(jwt);
 
-        // Intentamos autenticar si hay username y todavía no hay nadie autenticado
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            if (userDetails instanceof CustomUserDetails customUserDetails
+                    && jwtService.isTokenValid(jwt, customUserDetails)) {
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
@@ -57,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
- 
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
