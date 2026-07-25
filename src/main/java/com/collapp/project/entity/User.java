@@ -56,7 +56,7 @@ public class User {
     @Column(name = "instagram_url")
     private String instagramUrl;
 
-    @Column(nullable = true)
+    @Column(name = "avatar_url")
     private String avatarUrl;
 
     @CreationTimestamp
