@@ -1,10 +1,12 @@
 package com.collapp.project.controller;
 
+import com.collapp.project.dto.application.ApplicationResponse;
 import com.collapp.project.dto.offer.OfferRequest;
 import com.collapp.project.dto.offer.OfferResponse;
 import com.collapp.project.dto.offer.OfferStatusRequest;
 import com.collapp.project.entity.enums.Specialty;
 import com.collapp.project.security.CustomUserDetails;
+import com.collapp.project.service.ApplicationService;
 import com.collapp.project.service.OfferService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
 public class OfferController {
 
     private final OfferService offerService;
+    private final ApplicationService applicationService;
 
     @GetMapping
     public ResponseEntity<Page<OfferResponse>> list(
@@ -29,9 +34,22 @@ public class OfferController {
         return ResponseEntity.ok(offerService.list(category, pageable));
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<List<OfferResponse>> listMyOffers(Authentication authentication) {
+        return ResponseEntity.ok(offerService.listMine(extractEmail(authentication)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<OfferResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(offerService.getById(id));
+    }
+
+    @GetMapping("/{id}/applications")
+    public ResponseEntity<List<ApplicationResponse>> listApplicationsForOffer(
+            @PathVariable Long id,
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                applicationService.listByOffer(id, extractEmail(authentication)));
     }
 
     @PostMapping

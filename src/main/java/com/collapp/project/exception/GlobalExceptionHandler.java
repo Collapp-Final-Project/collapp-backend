@@ -62,4 +62,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenOperationException ex) {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
+
+    @ExceptionHandler(DuplicateApplicationException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateApplication(DuplicateApplicationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(SelfApplicationException.class)
+    public ResponseEntity<Map<String, String>> handleSelfApplication(SelfApplicationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", ex.getMessage()));
+    }
 }

@@ -8,10 +8,14 @@ import com.collapp.project.entity.enums.OfferStatus;
 import com.collapp.project.entity.enums.Specialty;
 import com.collapp.project.exception.ForbiddenOperationException;
 import com.collapp.project.exception.ResourceNotFoundException;
+import com.collapp.project.mapper.OfferMapper;
 import com.collapp.project.repository.OfferRepository;
 import com.collapp.project.repository.UserRepository;
 import com.collapp.project.service.OfferService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,7 @@ public class OfferServiceImpl implements OfferService {
 
     private final OfferRepository offerRepository;
     private final UserRepository userRepository;
+    private final OfferMapper offerMapper;
 
     @Override
     public OfferResponse create(OfferRequest request, String creatorEmail) {
@@ -39,7 +44,7 @@ public class OfferServiceImpl implements OfferService {
                 .status(OfferStatus.OPEN)
                 .build();
 
-        return OfferResponse.fromEntity(offerRepository.save(offer));
+        return offerMapper.toResponse(offerRepository.save(offer));
     }
 
     @Override
@@ -55,15 +60,7 @@ public class OfferServiceImpl implements OfferService {
         offer.setEndDate(request.endDate());
         offer.setCompensationType(request.compensationType());
 
-        return OfferResponse.fromEntity(offerRepository.save(offer));
-    }
-
-    @Override
-    public OfferResponse updateStatus(Long offerId, OfferStatus status, String requesterEmail) {
-        Offer offer = findOfferById(offerId);
-        assertIsOwner(offer, requesterEmail);
-        offer.setStatus(status);
-        return OfferResponse.fromEntity(offerRepository.save(offer));
+        return offerMapper.toResponse(offerRepository.save(offer));
     }
 
     @Override
@@ -75,7 +72,7 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     public OfferResponse getById(Long offerId) {
-        return OfferResponse.fromEntity(findOfferById(offerId));
+        return offerMapper.toResponse(findOfferById(offerId));
     }
 
     @Override
@@ -84,10 +81,27 @@ public class OfferServiceImpl implements OfferService {
                 ? offerRepository.findByStatusAndCategory(OfferStatus.OPEN, category, pageable)
                 : offerRepository.findByStatus(OfferStatus.OPEN, pageable);
 
-        return offers.map(OfferResponse::fromEntity);
+        return offers.map(offerMapper::toResponse);
     }
 
-    // --- Helpers ---
+    @Override
+    public OfferResponse updateStatus(Long offerId, OfferStatus status, String requesterEmail) {
+        Offer offer = findOfferById(offerId);
+        assertIsOwner(offer, requesterEmail);
+        offer.setStatus(status);
+        return offerMapper.toResponse(offerRepository.save(offer));
+    }
+    @Override
+    public List<OfferResponse> listMine(String creatorEmail) {
+        User creator = userRepository.findByEmail(creatorEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return offerRepository.findByCreatorId(creator.getId()).stream()
+                .map(offerMapper::toResponse)
+                .toList();
+    }
+
+    // --- Helpers---
 
     private Offer findOfferById(Long id) {
         return offerRepository.findById(id)

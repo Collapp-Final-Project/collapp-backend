@@ -1,5 +1,8 @@
 package com.collapp.project.dto.application;
 
-public record ApplicationRequest() {
+import jakarta.validation.constraints.NotNull;
 
-}
+public record ApplicationRequest(
+        @NotNull Long offerId,
+        String message
+) {}
