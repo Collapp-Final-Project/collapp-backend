@@ -1,12 +1,16 @@
 package com.collapp.project.controller;
 
 import com.collapp.project.dto.user.UserResponse;
+import com.collapp.project.dto.user.UserUpdateRequest;
 import com.collapp.project.security.CustomUserDetails;
 import com.collapp.project.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +25,13 @@ public class UserController {
     public ResponseEntity<UserResponse> getMe(Authentication authentication) {
         String email = ((CustomUserDetails) authentication.getPrincipal()).getUser().getEmail();
         return ResponseEntity.ok(userService.getCurrentUser(email));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<UserResponse> updateMe(
+            Authentication authentication,
+            @Valid @RequestBody UserUpdateRequest request) {
+        String email = ((CustomUserDetails) authentication.getPrincipal()).getUser().getEmail();
+        return ResponseEntity.ok(userService.updateCurrentUser(email, request));
     }
 }

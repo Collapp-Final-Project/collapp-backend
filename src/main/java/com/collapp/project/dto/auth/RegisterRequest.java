@@ -28,6 +28,7 @@ public record RegisterRequest(
         Specialty specialty,
 
         // Pantalla 2 — datos opcionales
+        String bio,
         String avatarUrl,
         String portfolioUrl,
         String instagramUrl

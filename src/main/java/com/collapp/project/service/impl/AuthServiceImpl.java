@@ -46,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
                 .avatarUrl(request.avatarUrl())
                 .portfolioUrl(request.portfolioUrl())
                 .instagramUrl(request.instagramUrl())
+                .bio(request.bio())
                 .build();
 
         userRepository.save(user);
