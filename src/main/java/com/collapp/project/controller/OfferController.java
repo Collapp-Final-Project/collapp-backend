@@ -39,6 +39,11 @@ public class OfferController {
         return ResponseEntity.ok(offerService.listMine(extractEmail(authentication)));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<OfferResponse>> listAll() {
+        return ResponseEntity.ok(offerService.listAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<OfferResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(offerService.getById(id));
@@ -70,7 +75,7 @@ public class OfferController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
-        offerService.delete(id, extractEmail(authentication));
+        offerService.delete(id, extractEmail(authentication), isAdmin(authentication));
         return ResponseEntity.noContent().build();
     }
 
@@ -85,5 +90,11 @@ public class OfferController {
     // Extrae el email del usuario autenticado
     private String extractEmail(Authentication authentication) {
         return ((CustomUserDetails) authentication.getPrincipal()).getUser().getEmail();
+    }
+
+    // Comprueba si el usuario autenticado tiene rol de administrador
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 }
