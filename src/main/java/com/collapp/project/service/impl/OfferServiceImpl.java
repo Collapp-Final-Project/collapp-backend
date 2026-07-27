@@ -59,6 +59,7 @@ public class OfferServiceImpl implements OfferService {
         offer.setStartDate(request.startDate());
         offer.setEndDate(request.endDate());
         offer.setCompensationType(request.compensationType());
+        offer.setStatus(request.status());
 
         return offerMapper.toResponse(offerRepository.save(offer));
     }

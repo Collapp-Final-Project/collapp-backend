@@ -1,10 +1,12 @@
 package com.collapp.project.dto.offer;
 
+import com.collapp.project.entity.enums.OfferStatus;
 import com.collapp.project.entity.enums.CompensationType;
 import com.collapp.project.entity.enums.Specialty;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 
 import java.time.LocalDate;
 
@@ -30,5 +32,9 @@ public record OfferRequest(
         LocalDate endDate,
 
         @NotNull(message = "El tipo de compensación es obligatorio")
-        CompensationType compensationType
+        CompensationType compensationType,
+
+        @NotNull(message = "El estado es obligatorio")
+        OfferStatus status
+
 ) {}
