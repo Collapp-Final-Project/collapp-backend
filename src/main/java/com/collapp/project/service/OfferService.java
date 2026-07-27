@@ -16,7 +16,7 @@ public interface OfferService {
 
     OfferResponse update(Long offerId, OfferRequest request, String requesterEmail);
 
-    void delete(Long offerId, String requesterEmail);
+    void delete(Long offerId, String requesterEmail, boolean isAdmin);
 
     OfferResponse getById(Long offerId);
 
@@ -25,4 +25,6 @@ public interface OfferService {
     OfferResponse updateStatus(Long offerId, OfferStatus status, String requesterEmail);
 
     List<OfferResponse> listMine(String creatorEmail);
+
+    List<OfferResponse> listAll();
 }

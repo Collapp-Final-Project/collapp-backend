@@ -65,9 +65,9 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public void delete(Long offerId, String requesterEmail) {
+    public void delete(Long offerId, String requesterEmail, boolean isAdmin) {
         Offer offer = findOfferById(offerId);
-        assertIsOwner(offer, requesterEmail);
+        assertIsOwnerOrAdmin(offer, requesterEmail, isAdmin);
         offerRepository.delete(offer);
     }
 
@@ -92,12 +92,20 @@ public class OfferServiceImpl implements OfferService {
         offer.setStatus(status);
         return offerMapper.toResponse(offerRepository.save(offer));
     }
+
     @Override
     public List<OfferResponse> listMine(String creatorEmail) {
         User creator = userRepository.findByEmail(creatorEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return offerRepository.findByCreatorId(creator.getId()).stream()
+                .map(offerMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<OfferResponse> listAll() {
+        return offerRepository.findAll().stream()
                 .map(offerMapper::toResponse)
                 .toList();
     }
@@ -117,6 +125,13 @@ public class OfferServiceImpl implements OfferService {
     private void assertIsOwner(Offer offer, String requesterEmail) {
         if (!offer.getCreator().getEmail().equals(requesterEmail)) {
             throw new ForbiddenOperationException("No tienes permiso para modificar esta oferta");
+        }
+    }
+
+    private void assertIsOwnerOrAdmin(Offer offer, String requesterEmail, boolean isAdmin) {
+        boolean isOwner = offer.getCreator().getEmail().equals(requesterEmail);
+        if (!isOwner && !isAdmin) {
+            throw new ForbiddenOperationException("No tienes permiso para eliminar esta oferta");
         }
     }
 }
