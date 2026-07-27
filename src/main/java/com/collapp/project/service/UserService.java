@@ -1,5 +1,7 @@
 package com.collapp.project.service;
 
-public interface UserService {
+import com.collapp.project.dto.user.UserResponse;
 
+public interface UserService {
+    UserResponse getCurrentUser(String email);
 }
