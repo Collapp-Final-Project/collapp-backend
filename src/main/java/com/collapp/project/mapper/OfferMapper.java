@@ -12,6 +12,7 @@ public class OfferMapper {
                 offer.getId(),
                 offer.getCreator().getId(),
                 offer.getCreator().getUsername(),
+                offer.getCreator().getAvatarUrl(),
                 offer.getTitle(),
                 offer.getDescription(),
                 offer.getCategory(),

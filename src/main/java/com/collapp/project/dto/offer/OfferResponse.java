@@ -11,6 +11,7 @@ public record OfferResponse(
         Long id,
         Long creatorId,
         String creatorUsername,
+        String creatorAvatarUrl,
         String title,
         String description,
         Specialty category,
