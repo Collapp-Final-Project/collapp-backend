@@ -1,5 +1,12 @@
 package com.collapp.project.dto.auth;
 
-public record LoginRequest() {
+import jakarta.validation.constraints.NotBlank;
 
-}
+public record LoginRequest(
+
+        @NotBlank(message = "El email es obligatorio")
+        String email,
+
+        @NotBlank(message = "La contraseña es obligatoria")
+        String password
+) {}
