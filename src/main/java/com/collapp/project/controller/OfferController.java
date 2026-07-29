@@ -5,7 +5,7 @@ import com.collapp.project.dto.offer.OfferRequest;
 import com.collapp.project.dto.offer.OfferResponse;
 import com.collapp.project.dto.offer.OfferStatusRequest;
 import com.collapp.project.entity.enums.Specialty;
-import com.collapp.project.security.CustomUserDetails;
+import com.collapp.project.security.AuthHelper;
 import com.collapp.project.service.ApplicationService;
 import com.collapp.project.service.OfferService;
 import jakarta.validation.Valid;
@@ -26,6 +26,7 @@ public class OfferController {
 
     private final OfferService offerService;
     private final ApplicationService applicationService;
+    private final AuthHelper authHelper;
 
     @GetMapping
     public ResponseEntity<Page<OfferResponse>> list(
@@ -36,7 +37,7 @@ public class OfferController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<OfferResponse>> listMyOffers(Authentication authentication) {
-        return ResponseEntity.ok(offerService.listMine(extractEmail(authentication)));
+        return ResponseEntity.ok(offerService.listMine(authHelper.extractEmail(authentication)));
     }
 
     @GetMapping("/all")
@@ -54,14 +55,14 @@ public class OfferController {
             @PathVariable Long id,
             Authentication authentication) {
         return ResponseEntity.ok(
-                applicationService.listByOffer(id, extractEmail(authentication)));
+                applicationService.listByOffer(id, authHelper.extractEmail(authentication)));
     }
 
     @PostMapping
     public ResponseEntity<OfferResponse> create(
             @Valid @RequestBody OfferRequest request,
             Authentication authentication) {
-        OfferResponse response = offerService.create(request, extractEmail(authentication));
+        OfferResponse response = offerService.create(request, authHelper.extractEmail(authentication));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -70,12 +71,12 @@ public class OfferController {
             @PathVariable Long id,
             @Valid @RequestBody OfferRequest request,
             Authentication authentication) {
-        return ResponseEntity.ok(offerService.update(id, request, extractEmail(authentication)));
+        return ResponseEntity.ok(offerService.update(id, request, authHelper.extractEmail(authentication)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
-        offerService.delete(id, extractEmail(authentication), isAdmin(authentication));
+        offerService.delete(id, authHelper.extractEmail(authentication), authHelper.isAdmin(authentication));
         return ResponseEntity.noContent().build();
     }
 
@@ -84,17 +85,6 @@ public class OfferController {
             @PathVariable Long id,
             @Valid @RequestBody OfferStatusRequest request,
             Authentication authentication) {
-        return ResponseEntity.ok(offerService.updateStatus(id, request.status(), extractEmail(authentication)));
-    }
-
-    // Extrae el email del usuario autenticado
-    private String extractEmail(Authentication authentication) {
-        return ((CustomUserDetails) authentication.getPrincipal()).getUser().getEmail();
-    }
-
-    // Comprueba si el usuario autenticado tiene rol de administrador
-    private boolean isAdmin(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+        return ResponseEntity.ok(offerService.updateStatus(id, request.status(), authHelper.extractEmail(authentication)));
     }
 }

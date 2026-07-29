@@ -53,18 +53,18 @@ public class ApplicationServiceImpl implements ApplicationService {
         Offer offer = findOfferOrThrow(offerId);
         validateOwnership(offer, requesterEmail);
 
-        return applicationRepository.findByOfferId(offerId).stream()
-                .map(applicationMapper::toResponse)
-                .toList();
+        return applicationMapper.toResponseList(
+                applicationRepository.findByOfferId(offerId)
+        );
     }
 
     @Override
     public List<ApplicationResponse> listMine(String applicantEmail) {
         User applicant = findUserByEmailOrThrow(applicantEmail);
 
-        return applicationRepository.findByApplicantId(applicant.getId()).stream()
-                .map(applicationMapper::toResponse)
-                .toList();
+        return applicationMapper.toResponseList(
+                applicationRepository.findByApplicantId(applicant.getId())
+        );
     }
 
     @Override

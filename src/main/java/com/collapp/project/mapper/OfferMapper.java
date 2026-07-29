@@ -4,6 +4,8 @@ import com.collapp.project.dto.offer.OfferResponse;
 import com.collapp.project.entity.Offer;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class OfferMapper {
 
@@ -12,6 +14,7 @@ public class OfferMapper {
                 offer.getId(),
                 offer.getCreator().getId(),
                 offer.getCreator().getUsername(),
+                offer.getCreator().getAvatarUrl(),
                 offer.getTitle(),
                 offer.getDescription(),
                 offer.getCategory(),
@@ -22,5 +25,11 @@ public class OfferMapper {
                 offer.getStatus(),
                 offer.getCreatedAt()
         );
+    }
+
+    public List<OfferResponse> toResponseList(List<Offer> offers) {
+        return offers.stream()
+                .map(this::toResponse)
+                .toList();
     }
 }

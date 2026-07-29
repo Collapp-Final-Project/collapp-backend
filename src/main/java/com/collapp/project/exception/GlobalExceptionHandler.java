@@ -64,14 +64,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateApplicationException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateApplication(DuplicateApplicationException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", ex.getMessage()));
+    public ResponseEntity<Map<String, Object>> handleDuplicateApplication(DuplicateApplicationException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(SelfApplicationException.class)
-    public ResponseEntity<Map<String, String>> handleSelfApplication(SelfApplicationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", ex.getMessage()));
+    public ResponseEntity<Map<String, Object>> handleSelfApplication(SelfApplicationException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 }
