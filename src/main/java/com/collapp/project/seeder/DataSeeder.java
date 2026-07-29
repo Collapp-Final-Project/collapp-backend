@@ -5,10 +5,12 @@ import com.collapp.project.entity.enums.Specialty;
 import com.collapp.project.entity.enums.SystemRole;
 import com.collapp.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
@@ -20,14 +22,14 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) {
 
         if (userRepository.count() > 0) {
-            return; // ya hay datos, no se vuelve a sembrar
+            return; 
         }
 
         User admin = User.builder()
                 .username("admin")
                 .fullName("Administrador Collapp")
                 .email("admin@collapp.com")
-                .passwordHash(passwordEncoder.encode("admin123"))
+                .passwordHash(passwordEncoder.encode("12345678"))
                 .systemRole(SystemRole.ROLE_ADMIN)
                 .specialty(Specialty.PRODUCTION)
                 .build();
@@ -35,8 +37,8 @@ public class DataSeeder implements CommandLineRunner {
         User maquilladora = User.builder()
                 .username("lola_sfx")
                 .fullName("Lola Fernández")
-                .email("lola@creativo.com")
-                .passwordHash(passwordEncoder.encode("123456"))
+                .email("lola@makeup.com")
+                .passwordHash(passwordEncoder.encode("12345678"))
                 .systemRole(SystemRole.ROLE_CREATIVE)
                 .specialty(Specialty.MAKEUP)
                 .bio("Especialista en maquillaje SFX para cine y series.")
@@ -45,8 +47,8 @@ public class DataSeeder implements CommandLineRunner {
         User fotografo = User.builder()
                 .username("alex_photo")
                 .fullName("Alex Rivera")
-                .email("alex@creativo.com")
-                .passwordHash(passwordEncoder.encode("123456"))
+                .email("alex@photo.com")
+                .passwordHash(passwordEncoder.encode("12345678"))
                 .systemRole(SystemRole.ROLE_CREATIVE)
                 .specialty(Specialty.PHOTOGRAPHY_VIDEO)
                 .portfolioUrl("https://alexrivera-portfolio.com")
@@ -56,6 +58,6 @@ public class DataSeeder implements CommandLineRunner {
         userRepository.save(maquilladora);
         userRepository.save(fotografo);
 
-        System.out.println("DataSeeder: usuarios de prueba creados (admin / lola_sfx / alex_photo)");
+        log.info("DataSeeder: usuarios de prueba creados (admin / lola_sfx / alex_photo)");
     }
 }

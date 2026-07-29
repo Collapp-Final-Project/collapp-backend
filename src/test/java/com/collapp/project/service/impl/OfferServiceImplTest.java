@@ -221,7 +221,7 @@ class OfferServiceImplTest {
     void listMine_success() {
         when(userRepository.findByEmail(creator.getEmail())).thenReturn(Optional.of(creator));
         when(offerRepository.findByCreatorId(creator.getId())).thenReturn(List.of(offer));
-        when(offerMapper.toResponse(offer)).thenReturn(offerResponse);
+        when(offerMapper.toResponseList(List.of(offer))).thenReturn(List.of(offerResponse));
 
         List<OfferResponse> result = offerService.listMine(creator.getEmail());
 
@@ -233,7 +233,7 @@ class OfferServiceImplTest {
     @Test
     void listAll_success() {
         when(offerRepository.findAll()).thenReturn(List.of(offer));
-        when(offerMapper.toResponse(offer)).thenReturn(offerResponse);
+        when(offerMapper.toResponseList(List.of(offer))).thenReturn(List.of(offerResponse));
 
         List<OfferResponse> result = offerService.listAll();
 

@@ -2,7 +2,7 @@ package com.collapp.project.controller;
 import com.collapp.project.dto.application.ApplicationRequest;
 import com.collapp.project.dto.application.ApplicationResponse;
 import com.collapp.project.dto.application.ApplicationStatusRequest;
-import com.collapp.project.security.CustomUserDetails;
+import com.collapp.project.security.AuthHelper;
 import com.collapp.project.service.ApplicationService;
 
 import jakarta.validation.Valid;
@@ -21,18 +21,19 @@ import java.util.List;
 public class ApplicationController {
 
     private final ApplicationService applicationService;
+    private final AuthHelper authHelper;
 
     @PostMapping
     public ResponseEntity<ApplicationResponse> create(
             @Valid @RequestBody ApplicationRequest request,
             Authentication authentication) {
-        ApplicationResponse response = applicationService.create(request, extractEmail(authentication));
+        ApplicationResponse response = applicationService.create(request, authHelper.extractEmail(authentication));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/mine")
     public ResponseEntity<List<ApplicationResponse>> listMine(Authentication authentication) {
-        return ResponseEntity.ok(applicationService.listMine(extractEmail(authentication)));
+        return ResponseEntity.ok(applicationService.listMine(authHelper.extractEmail(authentication)));
     }
 
     @PatchMapping("/{id}/status")
@@ -41,12 +42,7 @@ public class ApplicationController {
             @Valid @RequestBody ApplicationStatusRequest request,
             Authentication authentication) {
         return ResponseEntity.ok(
-                applicationService.updateStatus(id, request, extractEmail(authentication))
+                applicationService.updateStatus(id, request, authHelper.extractEmail(authentication))
         );
     }
-
-    private String extractEmail(Authentication authentication) {
-        return ((CustomUserDetails) authentication.getPrincipal()).getUser().getEmail();
-    }
-
 }

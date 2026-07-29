@@ -139,7 +139,7 @@ class ApplicationServiceImplTest {
     void listByOffer_success() {
         when(offerRepository.findById(offer.getId())).thenReturn(Optional.of(offer));
         when(applicationRepository.findByOfferId(offer.getId())).thenReturn(List.of(application));
-        when(applicationMapper.toResponse(application)).thenReturn(applicationResponse);
+        when(applicationMapper.toResponseList(List.of(application))).thenReturn(List.of(applicationResponse));
 
         List<ApplicationResponse> result = applicationService.listByOffer(offer.getId(), creator.getEmail());
 
@@ -162,7 +162,7 @@ class ApplicationServiceImplTest {
     void listMine_success() {
         when(userRepository.findByEmail(applicant.getEmail())).thenReturn(Optional.of(applicant));
         when(applicationRepository.findByApplicantId(applicant.getId())).thenReturn(List.of(application));
-        when(applicationMapper.toResponse(application)).thenReturn(applicationResponse);
+        when(applicationMapper.toResponseList(List.of(application))).thenReturn(List.of(applicationResponse));
 
         List<ApplicationResponse> result = applicationService.listMine(applicant.getEmail());
 

@@ -78,9 +78,13 @@ public class OfferServiceImpl implements OfferService {
 
     @Override
     public Page<OfferResponse> list(Specialty category, Pageable pageable) {
-        Page<Offer> offers = (category != null)
-                ? offerRepository.findByStatusAndCategory(OfferStatus.OPEN, category, pageable)
-                : offerRepository.findByStatus(OfferStatus.OPEN, pageable);
+        Page<Offer> offers;
+
+        if (category != null) {
+            offers = offerRepository.findByStatusAndCategory(OfferStatus.OPEN, category, pageable);
+        } else {
+            offers = offerRepository.findByStatus(OfferStatus.OPEN, pageable);
+        }
 
         return offers.map(offerMapper::toResponse);
     }
@@ -98,16 +102,14 @@ public class OfferServiceImpl implements OfferService {
         User creator = userRepository.findByEmail(creatorEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return offerRepository.findByCreatorId(creator.getId()).stream()
-                .map(offerMapper::toResponse)
-                .toList();
+        return offerMapper.toResponseList(
+                offerRepository.findByCreatorId(creator.getId())
+        );
     }
 
     @Override
     public List<OfferResponse> listAll() {
-        return offerRepository.findAll().stream()
-                .map(offerMapper::toResponse)
-                .toList();
+        return offerMapper.toResponseList(offerRepository.findAll());
     }
 
     // --- Helpers---
