@@ -1,0 +1,4 @@
+- name: Run OpenCode
+        env:
+          GITHUB_TOKEN: ${{ secrets.ORGANIZATION_PROJECT_PAT }} #  Con acceso a los tableros de la Org
+          API_KEY: ${{ secrets.API_KEY }}
